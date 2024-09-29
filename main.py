@@ -1,7 +1,7 @@
 from src.widget import get_date, mask_account_card
 
 if __name__ == "__main__":
-    # Примеры входных данных для проверки функции mask_account_card
+    # Примеры входных данных для проверки функции  mask_account_card
     test_cases = [
         "Maestro 1596837868705199",
         "Счет 64686473678894779589",
