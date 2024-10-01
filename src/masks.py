@@ -1,8 +1,5 @@
 def get_mask_card_number(card_number: int) -> str:
     """
-    def get_mask_card_number(card_number):- Это объявление функции с названием `get_mask_card_number`,
-    которая принимает один аргумент `card_number` - номер банковской карты.
-
     Маскирует номер банковской карты, оставляя видимыми первые 6 и последние 4 цифры.
 
     :param card_number: Номер карты в виде целого числа.

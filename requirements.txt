@@ -1,0 +1,4 @@
+# Пример содержимого requirements.txt
+requests
+numpy
+pandas
