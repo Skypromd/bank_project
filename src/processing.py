@@ -1,24 +1,27 @@
+# src/processing/processing.py
+
 from typing import List, Dict, Optional
 
-def filter_by_state(transactions: List[Dict], state: Optional[str] = 'EXECUTED') -> List[Dict]:
-    """
-    Фильтрует список словарей по состоянию.
+def filter_by_state(transactions: List[Dict], state: str = 'EXECUTED') -> List[Dict]:
+    """Фильтрует список словарей по значению ключа 'state'.
 
-    :param transactions: Список словарей с данными о банковских операциях.
-    :param state: Значение для ключа 'state' (по умолчанию 'EXECUTED').
-    :return: Новый список словарей с соответствующим состоянием.
+    Args:
+        transactions (List[Dict]): Список словарей с данными о банковских операциях.
+        state (str, optional): Значение для фильтрации по ключу 'state'. По умолчанию 'EXECUTED'.
+
+    Returns:
+        List[Dict]: Новый список словарей, соответствующих условию фильтрации.
     """
     return [transaction for transaction in transactions if transaction.get('state') == state]
 
+def sort_by_date(transactions: List[Dict], descending: bool = True) -> List[Dict]:
+    """Сортирует список словарей по дате.
 
-from datetime import datetime
+    Args:
+        transactions (List[Dict]): Список словарей с данными о банковских операциях.
+        descending (bool, optional): Указывает порядок сортировки. По умолчанию True (по убыванию).
 
-def sort_by_date(transactions: List[Dict], descending: Optional[bool] = True) -> List[Dict]:
+    Returns:
+        List[Dict]: Новый список словарей, отсортированных по дате.
     """
-    Сортирует список словарей по дате.
-
-    :param transactions: Список словарей с данными о банковских операциях.
-    :param descending: Параметр, задающий порядок сортировки (по умолчанию True).
-    :return: Новый отсортированный список словарей.
-    """
-    return sorted(transactions, key=lambda x: datetime.fromisoformat(x['date']), reverse=descending)
+    return sorted(transactions, key=lambda x: x['date'], reverse=descending)
