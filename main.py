@@ -2,6 +2,7 @@ from src.widget import get_date, mask_account_card
 from src.processing import filter_by_state, sort_by_date
 
 
+
 def main() -> None:
     # Примеры входных данных для проверки функции mask_account_card
     test_cases = [

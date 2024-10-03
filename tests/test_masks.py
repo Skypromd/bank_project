@@ -5,14 +5,19 @@ from src.processing import filter_by_state, sort_by_date
 
 
 def test_get_mask_card_number() -> None:
+
+
     """Тестирование функции get_mask_card_number."""
+
     assert get_mask_card_number(7000792289606361) == "7000 79** **** 6361"
     with pytest.raises(ValueError):
         get_mask_card_number(123456)
 
 
 def test_get_mask_account() -> None:
+
     """Тестирование функции get_mask_account."""
+
     assert get_mask_account(73654108430135874305) == "**4305"
     with pytest.raises(ValueError):
         get_mask_account(123)
