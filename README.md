@@ -12,7 +12,8 @@
 1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/Skypromd/bank_project.gitRL
-## Тестирование
+
+Тестирование
 
 - Для запуска тестов используйте `pytest`. Убедитесь, что у вас установлены все зависимости, и выполните команду:
 
@@ -26,3 +27,6 @@ pytest
 
    ```bash
    pip install pytest pytest-cov
+
+   
+
