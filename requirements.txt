@@ -2,3 +2,5 @@
 requests
 numpy
 pandas
+
+pytest~=8.3.3

@@ -1,24 +1,27 @@
-from typing import List, Dict, Optional
+from typing import Dict, List
 
-def filter_by_state(transactions: List[Dict], state: Optional[str] = 'EXECUTED') -> List[Dict]:
+
+def filter_by_state(transactions: List[Dict], state: str = "EXECUTED") -> List[Dict]:
+    """Фильтрует список словарей по значению ключа 'state'.
+
+    Args:
+        transactions (List[Dict]): Список словарей с данными о банковских операциях.
+        state (str, optional): Значение для фильтрации по ключу 'state'. По умолчанию 'EXECUTED'.
+
+    Returns:
+        List[Dict]: Новый список словарей, соответствующих условию фильтрации.
     """
-    Фильтрует список словарей по состоянию.
+    return [transaction for transaction in transactions if transaction.get("state") == state]
 
-    :param transactions: Список словарей с данными о банковских операциях.
-    :param state: Значение для ключа 'state' (по умолчанию 'EXECUTED').
-    :return: Новый список словарей с соответствующим состоянием.
+
+def sort_by_date(transactions: List[Dict], descending: bool = True) -> List[Dict]:
+    """Сортирует список словарей по дате.
+
+    Args:
+        transactions (List[Dict]): Список словарей с данными о банковских операциях.
+        descending (bool, optional): Указывает порядок сортировки. По умолчанию True (по убыванию).
+
+    Returns:
+        List[Dict]: Новый список словарей, отсортированных по дате.
     """
-    return [transaction for transaction in transactions if transaction.get('state') == state]
-
-
-from datetime import datetime
-
-def sort_by_date(transactions: List[Dict], descending: Optional[bool] = True) -> List[Dict]:
-    """
-    Сортирует список словарей по дате.
-
-    :param transactions: Список словарей с данными о банковских операциях.
-    :param descending: Параметр, задающий порядок сортировки (по умолчанию True).
-    :return: Новый отсортированный список словарей.
-    """
-    return sorted(transactions, key=lambda x: datetime.fromisoformat(x['date']), reverse=descending)
+    return sorted(transactions, key=lambda x: x["date"], reverse=descending)

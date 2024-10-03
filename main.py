@@ -1,4 +1,4 @@
-from src.widget import (get_date, mask_account_card)
+from src.widget import get_date, mask_account_card
 
 if __name__ == "__main__":
     # Примеры входных данных для проверки функции  mask_account_card
@@ -10,7 +10,7 @@ if __name__ == "__main__":
         "Visa Classic 6831982476737658",
         "Visa Platinum 8990922113665229",
         "Visa Gold 5999414228426353",
-        "Счет 73654108430135874305"
+        "Счет 73654108430135874305",
     ]
 
     for case in test_cases:
