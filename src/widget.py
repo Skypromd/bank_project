@@ -1,7 +1,6 @@
-from datetime import datetime  # Третий
-
-from src.masks import get_mask_account  # Другой импорт
 from src.masks import get_mask_card_number  # Один импорт
+from src.masks import get_mask_account  # Другой импорт
+from datetime import datetime  # Третий
 
 
 def mask_account_card(input_string: str) -> str:
