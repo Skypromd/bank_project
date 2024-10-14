@@ -1,5 +1,6 @@
 import unittest
-from main import mask_account_card, get_date
+
+from main import get_date, mask_account_card
 
 
 class TestBankOperations(unittest.TestCase):
