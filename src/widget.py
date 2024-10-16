@@ -1,37 +1,49 @@
-from datetime import datetime  # Третий
-
-from src.masks import get_mask_account  # Другой импорт
-from src.masks import get_mask_card_number  # Один импорт
+from datetime import datetime
 
 
-def mask_account_card(input_string: str) -> str:
+def mask_account_card(card_number: str) -> str:
+    """Маскирует номер карты или счета.
+
+    Args:
+        card_number (str): Номер карты или счета.
+
+    Returns:
+        str: Маскированный номер карты или счета.
+
+    Raises:
+        ValueError: Если формат номера неверный.
     """
-    Маскирует номер карты или счета в зависимости от типа.
+    # Извлекаем только цифры из строки
+    digits = ''.join(filter(str.isdigit, card_number))
 
-    :param input_string: Строка, содержащая тип и номер карты или счета.
-    :return: Замаскированный номер в формате "Тип 7000 79** **** 6361" или "Тип **4305".
-    """
-    parts = input_string.split()
-    card_type = " ".join(parts[:-1])  # Все кроме последнего элемента
-    number = parts[-1]  # Последний элемент — номер карты/счета
+    # Проверяем длину номера карты
+    if len(digits) == 16:
+        # Форматирование номера карты
+        masked = f"{digits[:6]} {digits[6:8]}** **** {digits[-4:]}"
+        return f"{card_number.split()[0]} {masked}"
 
-    if len(number) == 16:  # Предполагаем, что это номер карты
-        masked_number = get_mask_card_number(int(number))
-    elif len(number) >= 4:  # Предполагаем, что это номер счета
-        masked_number = get_mask_account(int(number))
-    else:
-        raise ValueError("Неверный формат номера.")
+    # Проверка для номеров счетов (должно быть больше 4 цифр)
+    if len(digits) > 4:
+        # Форматирование номера счета, оставляя только последние 4 цифры
+        return f"{card_number.split()[0]} **{digits[-4:]}"
 
-    return f"{card_type} {masked_number}"
+    raise ValueError("Неверный формат номера карты или счета.")
 
 
 def get_date(date_string: str) -> str:
-    """
-    Преобразует строку даты в формате "2024-03-11T02:26:18.671407"
-    в формат "ДД.ММ.ГГГГ".
+    """Преобразует строку даты в формат 'DD.MM.YYYY'.
 
-    :param date_string: Дата в строковом формате.
-    :return: Дата в формате "ДД.ММ.ГГГГ".
+    Args:
+        date_string (str): Дата в формате ISO.
+
+    Returns:
+        str: Дата в формате 'DD.MM.YYYY'.
+
+    Raises:
+        ValueError: Если формат даты неверный.
     """
-    dt = datetime.fromisoformat(date_string)
-    return dt.strftime("%d.%m.%Y")
+    try:
+        dt = datetime.fromisoformat(date_string)
+        return dt.strftime("%d.%m.%Y")
+    except ValueError:
+        raise ValueError("Неверный формат даты.")

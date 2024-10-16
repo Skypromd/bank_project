@@ -2,6 +2,8 @@ import unittest
 
 from main import get_date, mask_account_card
 
+import unittest
+from src.widget import mask_account_card, get_date
 
 class TestBankOperations(unittest.TestCase):
     def test_mask_account_card(self) -> None:
@@ -22,7 +24,6 @@ class TestBankOperations(unittest.TestCase):
         # Тест для некорректного формата даты
         with self.assertRaises(ValueError):
             get_date("Неверная дата")  # Неверный формат даты
-
 
 if __name__ == "__main__":
     unittest.main()
