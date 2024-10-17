@@ -1,49 +1,28 @@
-from datetime import datetime
+from datetime import datetime  # Третий
 
+from src.masks import get_mask_account  # Другой импорт
+from src.masks import get_mask_card_number  # Один импорт
 
 def mask_account_card(card_number: str) -> str:
-    """Маскирует номер карты или счета.
+    """Маскирует номер банковской карты, оставляя видимыми первые 6 и последние 4 цифры."""
+    # Убираем все нецифровые символы
+    card_number_digits = ''.join(filter(str.isdigit, card_number))
 
-    Args:
-        card_number (str): Номер карты или счета.
+    # Проверка длины номера карты
+    if len(card_number_digits) != 16:
+        raise ValueError("Номер карты должен содержать 16 цифр.")
 
-    Returns:
-        str: Маскированный номер карты или счета.
-
-    Raises:
-        ValueError: Если формат номера неверный.
-    """
-    # Извлекаем только цифры из строки
-    digits = ''.join(filter(str.isdigit, card_number))
-
-    # Проверяем длину номера карты
-    if len(digits) == 16:
-        # Форматирование номера карты
-        masked = f"{digits[:6]} {digits[6:8]}** **** {digits[-4:]}"
-        return f"{card_number.split()[0]} {masked}"
-
-    # Проверка для номеров счетов (должно быть больше 4 цифр)
-    if len(digits) > 4:
-        # Форматирование номера счета, оставляя только последние 4 цифры
-        return f"{card_number.split()[0]} **{digits[-4:]}"
-
-    raise ValueError("Неверный формат номера карты или счета.")
-
+    # Форматирование замаскированного номера карты
+    masked_number = f"{card_number_digits[:6]} {card_number_digits[6:8]}** **** {card_number_digits[-4:]}"
+    return masked_number
 
 def get_date(date_string: str) -> str:
-    """Преобразует строку даты в формат 'DD.MM.YYYY'.
-
-    Args:
-        date_string (str): Дата в формате ISO.
-
-    Returns:
-        str: Дата в формате 'DD.MM.YYYY'.
-
-    Raises:
-        ValueError: Если формат даты неверный.
     """
-    try:
-        dt = datetime.fromisoformat(date_string)
-        return dt.strftime("%d.%m.%Y")
-    except ValueError:
-        raise ValueError("Неверный формат даты.")
+    Преобразует строку даты в формате "2024-03-11T02:26:18.671407"
+    в формат "ДД.ММ.ГГГГ".
+
+    :param date_string: Дата в строковом формате.
+    :return: Дата в формате "ДД.ММ.ГГГГ".
+    """
+    dt = datetime.fromisoformat(date_string)
+    return dt.strftime("%d.%m.%Y")
