@@ -1,12 +1,10 @@
 from datetime import datetime  # Третий
 
-from src.masks import get_mask_account  # Другой импорт
-from src.masks import get_mask_card_number  # Один импорт
 
 def mask_account_card(card_number: str) -> str:
     """Маскирует номер банковской карты, оставляя видимыми первые 6 и последние 4 цифры."""
     # Убираем все нецифровые символы
-    card_number_digits = ''.join(filter(str.isdigit, card_number))
+    card_number_digits = "".join([char for char in card_number if char.isdigit()])
 
     # Проверка длины номера карты
     if len(card_number_digits) != 16:
@@ -15,6 +13,7 @@ def mask_account_card(card_number: str) -> str:
     # Форматирование замаскированного номера карты
     masked_number = f"{card_number_digits[:6]} {card_number_digits[6:8]}** **** {card_number_digits[-4:]}"
     return masked_number
+
 
 def get_date(date_string: str) -> str:
     """
