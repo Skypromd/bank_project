@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, Iterator, List
 
 
 def filter_by_state(transactions: List[Dict], state: str = "EXECUTED") -> List[Dict]:
@@ -25,3 +25,10 @@ def sort_by_date(transactions: List[Dict], descending: bool = True) -> List[Dict
         List[Dict]: Новый список словарей, отсортированных по дате.
     """
     return sorted(transactions, key=lambda x: x["date"], reverse=descending)
+
+
+def filter_by_currency(transactions: List[Dict], currency: str) -> Iterator[Dict]:
+    """Возвращает итератор транзакций по заданной валюте."""
+    for transaction in transactions:
+        if transaction["operationAmount"]["currency"]["code"] == currency:
+            yield transaction

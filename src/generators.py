@@ -1,5 +1,3 @@
-# src/generators.py
-
 from typing import Dict, Iterator, List
 
 

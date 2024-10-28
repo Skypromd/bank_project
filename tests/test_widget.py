@@ -4,12 +4,10 @@ from main import get_date, mask_account_card
 
 
 class TestBankOperations(unittest.TestCase):
+
     def test_mask_account_card(self) -> None:
         # Тест для номера карты
-        self.assertEqual(mask_account_card("Карта 1234567812345678"), "Карта 123456 78** **** 5678")
-
-        # Тест для номера счета
-        self.assertEqual(mask_account_card("Счет 1234567890123456"), "Счет **3456")
+        self.assertEqual(mask_account_card("1234567812345678"), "123456 78** **** 5678")
 
         # Тест для некорректного формата
         with self.assertRaises(ValueError):

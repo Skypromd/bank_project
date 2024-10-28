@@ -1,28 +1,18 @@
 from datetime import datetime  # Третий
 
-from src.masks import get_mask_account  # Другой импорт
-from src.masks import get_mask_card_number  # Один импорт
 
+def mask_account_card(card_number: str) -> str:
+    """Маскирует номер банковской карты, оставляя видимыми первые 6 и последние 4 цифры."""
+    # Убираем все нецифровые символы
+    card_number_digits = "".join([char for char in card_number if char.isdigit()])
 
-def mask_account_card(input_string: str) -> str:
-    """
-    Маскирует номер карты или счета в зависимости от типа.
+    # Проверка длины номера карты
+    if len(card_number_digits) != 16:
+        raise ValueError("Номер карты должен содержать 16 цифр.")
 
-    :param input_string: Строка, содержащая тип и номер карты или счета.
-    :return: Замаскированный номер в формате "Тип 7000 79** **** 6361" или "Тип **4305".
-    """
-    parts = input_string.split()
-    card_type = " ".join(parts[:-1])  # Все кроме последнего элемента
-    number = parts[-1]  # Последний элемент — номер карты/счета
-
-    if len(number) == 16:  # Предполагаем, что это номер карты
-        masked_number = get_mask_card_number(int(number))
-    elif len(number) >= 4:  # Предполагаем, что это номер счета
-        masked_number = get_mask_account(int(number))
-    else:
-        raise ValueError("Неверный формат номера.")
-
-    return f"{card_type} {masked_number}"
+    # Форматирование замаскированного номера карты
+    masked_number = f"{card_number_digits[:6]} {card_number_digits[6:8]}** **** {card_number_digits[-4:]}"
+    return masked_number
 
 
 def get_date(date_string: str) -> str:
