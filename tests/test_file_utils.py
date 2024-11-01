@@ -3,6 +3,7 @@ import json
 import os
 from src.file_utils import load_json_file  # Исправлено импортирование
 
+
 class TestUtils(unittest.TestCase):
 
     def setUp(self):
@@ -51,6 +52,7 @@ class TestUtils(unittest.TestCase):
 
         result = load_json_file("data/invalid.json")
         self.assertEqual(result, [])
+
 
 if __name__ == "__main__":
     unittest.main()
