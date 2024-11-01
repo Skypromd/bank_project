@@ -19,14 +19,13 @@ currency_cache = {}
 cache_expiry_time = 3600  # 1 час, время жизни кэша
 
 
-def get_conversion_rate(from_currency: str, to_currency: str, amount: float) -> float:
+def get_conversion_rate(from_currency: str, to_currency: str) -> float:
     """
     Получает курс конвертации из кэша или API.
 
     :param from_currency: Код валюты, из которой конвертируем.
     :param to_currency: Код валюты, в которую конвертируем.
-    :param amount: Сумма для конвертации.
-    :return: Конвертированный результат.
+    :return: Курс конвертации.
     """
     global currency_cache
 
@@ -38,7 +37,7 @@ def get_conversion_rate(from_currency: str, to_currency: str, amount: float) -> 
         cached_rate, timestamp = currency_cache[cache_key]
         # Проверка, не истек ли срок действия кэша
         if current_time - timestamp < cache_expiry_time:
-            return amount * cached_rate
+            return cached_rate  # Возвращаем кэшированный курс
 
     # Если кэш устарел или отсутствует, запрашиваем новый курс
     api_key = os.getenv("API_KEY")
@@ -48,12 +47,12 @@ def get_conversion_rate(from_currency: str, to_currency: str, amount: float) -> 
     try:
         response = requests.get(
             API_URL,
-            params={"from": from_currency, "to": to_currency, "amount": amount},
+            params={"from": from_currency, "to": to_currency},
             headers={"apikey": api_key}
         )
         response.raise_for_status()  # Проверка на ошибки запроса
 
-        rate = response.json().get("result", 0.0)
+        rate = response.json().get("info", {}).get("rate", 0.0)
 
         if rate <= 0:
             logging.error("Получен некорректный курс конвертации.")
@@ -110,16 +109,19 @@ def convert_currency(transaction_data: dict) -> float:
     # Поддерживаемые валюты для конвертации
     supported_currencies = ["USD", "EUR"]
     if currency in supported_currencies:
-        conversion_result = get_conversion_rate(currency, "RUB", amount)
-        if conversion_result <= 0:
+        # Получаем курс конвертации из кэша или API
+        conversion_rate = get_conversion_rate(currency, "RUB")
+        if conversion_rate <= 0:
             logging.error(f"Некорректный результат конвертации для {amount} {currency}.")
             return 0.0
-        logging.info(f"Конвертировано {amount} {currency} в {conversion_result:.2f} RUB.")
-        return conversion_result
+
+        # Конвертируем сумму
+        converted_amount = amount * conversion_rate
+        logging.info(f"Конвертировано {amount} {currency} в {converted_amount:.2f} RUB.")
+        return converted_amount
 
     logging.warning(f"Неизвестная валюта: {currency}.")
     return 0.0
-
 
 def load_transactions_from_file(json_file_path: str) -> list:
     """
@@ -139,6 +141,7 @@ def load_transactions_from_file(json_file_path: str) -> list:
     except json.JSONDecodeError:
         logging.error("Ошибка при декодировании JSON.")
         return []
+
 # Укажите путь к вашему JSON-файлу
 file_path = '/home/mdgagauz/PycharmProjects/bank_project/data/operations.json'
 
@@ -149,4 +152,3 @@ transactions = load_transactions_from_file(file_path)
 for txn in transactions:
     result = convert_currency(txn)
     print(f"Транзакция ID {txn.get('id', 'неизвестен')} конвертирована в RUB: {result:.2f}")
-
