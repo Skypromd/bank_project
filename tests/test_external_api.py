@@ -3,13 +3,12 @@ from unittest.mock import patch
 from src.external_api.currency_converter import convert_currency
 
 class TestConvertCurrency(unittest.TestCase):
-
     @patch("src.external_api.currency_converter.requests.get")
     def test_convert_currency_valid_usd(self, mock_get):
-        mock_get.return_value.json.return_value = {"result": 100.0}
-        transaction = {"operationAmount": {"amount": "100.00", "currency": {"code": "USD"}}}
+        mock_get.return_value.json.return_value = {"info": {"rate": 75.0}}
+        transaction = {"operationAmount": {"amount": "100", "currency": {"code": "USD"}}}
         result = convert_currency(transaction)
-        self.assertEqual(result, 100.0)
+        self.assertEqual(result, 7500.0)  # Ожидаем, что 100 USD будет конвертировано в 7500 RUB
 
     @patch("src.external_api.currency_converter.requests.get")
     def test_convert_currency_valid_rub(self, mock_get):
