@@ -21,6 +21,7 @@ cache_expiry_time = 3600  # 1 час, время жизни кэша
 def get_conversion_rate(from_currency: str, to_currency: str) -> float:
     """
     Получает курс конвертации из кэша или API.
+    Обратите внимание: убедитесь, что API-ключ в .env файле корректный и действующий.
     """
     global currency_cache
     cache_key = f"{from_currency}_{to_currency}"
@@ -140,7 +141,7 @@ def validate_transaction(txn):
     return True
 
 if __name__ == '__main__':
-    # Укажите путь к вашему JSON-файлу
+    # Укажите путь к вашему JSON-файлу без пробелов
     file_path = '/home/mdgagauz/PycharmProjects/bank_project/data/operations.json'
 
     # Загружаем транзакции
