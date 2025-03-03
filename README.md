@@ -18,7 +18,10 @@
 ### Функции
 
 - **filter_by_currency(transactions, currency)**: Возвращает итератор транзакций по заданной валюте.
-  
+- **read_csv_transactions(path)**: Читает транзакции из CSV-файла.
+- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+
+
   **Пример использования**:
   ```python
   usd_transactions = filter_by_currency(transactions, "USD")
