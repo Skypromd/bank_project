@@ -7,7 +7,7 @@
 ## Цели проекта
 - Обеспечить удобный интерфейс для работы с банковскими операциями.
 - Позволить пользователям фильтровать и сортировать операции.
---Поддерживать чтение транзакций из JSON, CSV и Excel файлов.
+- Поддерживать чтение транзакций из JSON, CSV и Excel файлов.
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -18,9 +18,13 @@
 ### Функции
 
 - **filter_by_currency(transactions, currency)**: Возвращает итератор транзакций по заданной валюте.
+
 -**read_csv_transactions(path)**: Читает транзакции из CSV-файла.
-- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
-- **Пример использования**:
+-**read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+-**read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+
+  **Пример использования**:
+
   ```python
   usd_transactions = filter_by_currency(transactions, "USD")
   for _ in range(2):
@@ -65,12 +69,4 @@ pytest
    Убедитесь, что у вас установлены `pytest` и `pytest-cov` для проверки покрытия кода:
 
    ```bash
-   pip install pytest pytest-cov
-
-
-```python
-
-  from src.data_readers import read_csv_transactions, read_excel_transactions
-
-  csv_transactions = read_csv_transactions("data/transactions.csv")
-  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
+   pip install pytest pytes
