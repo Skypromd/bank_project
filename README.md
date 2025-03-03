@@ -67,3 +67,9 @@ pytest
 
    ```bash
    pip install pytest pytest-cov
+### Пример использования
+  ```python
+  from src.data_readers import read_csv_transactions, read_excel_transactions
+
+  csv_transactions = read_csv_transactions("data/transactions.csv")
+  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
