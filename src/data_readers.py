@@ -1,5 +1,6 @@
 """Модуль для чтения финансовых транзакций из CSV и Excel файлов."""
 import pandas as pd
+
 from typing import List, Dict, Any
 
 
