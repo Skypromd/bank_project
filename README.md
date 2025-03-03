@@ -1,58 +1,91 @@
-# Проект: Виджет банковских операций
+## Проект: Виджет банковских операций
 
 ## Описание
-Этот проект предназначен для обработки данных о банковских операциях. Он включает функции 
-для фильтрации операций по состоянию и сортировки операций по дате.
+Этот проект предназначен для обработки данных о банковских операциях. Он включает функции для фильтрации 
+операций по состоянию и сортировки операций по дате.
 
 ## Цели проекта
 - Обеспечить удобный интерфейс для работы с банковскими операциями.
 - Позволить пользователям фильтровать и сортировать операции.
 - Поддерживать чтение транзакций из JSON, CSV и Excel файлов.
-
 ## Установка
+
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/Skypromd/bank_project.git
-   
-### Модуль generators
-   Функции
--  filter_by_currency(transactions, currency): Возвращает итератор транзакций по заданной валюте.
--  read_csv_transactions(path): Читает транзакции из CSV-файла.
--  read_excel_transactions(path): Читает транзакции из Excel-файла.
-  
- 
-  Пример использования
+   git clone https://github.com/Skypromd/bank_project.gitRL
+## Модуль generators
 
+### Функции
 
-   '''from src. generators import filter_by_currency
+- **filter_by_currency(transactions, currency)**: Возвращает итератор транзакций по заданной валюте.
+-**read_csv_transactions(path)**: Читает транзакции из CSV-файла.
+- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+- **Пример использования**:
+  ```python
+  usd_transactions = filter_by_currency(transactions, "USD")
+  for _ in range(2):
+      print(next(usd_transactions))
+## Декоратор `log`
 
-transactions = [
-    {"amount": 100, "currency": "USD"},
-    {"amount": 200, "currency": "EUR"},
-    {"amount": 300, "currency": "USD"}
-]
-usd_transactions = filter_by_currency(transactions, "USD")
-for _ in range(2):
-    print(next(usd_transactions)) '''
+### Описание
 
+Декоратор `log` предназначен для автоматического логирования деталей выполнения функций, 
+включая время вызова, имя функции, передаваемые аргументы, результат выполнения и информацию 
+об ошибках. Это позволяет обеспечить более глубокий контроль и анализ поведения программы.
 
-### Декоратор log
-    Описание
-    Декоратор log предназначен для автоматического логирования деталей выполнения функций, 
-    включая время вызова, имя функции, передаваемые аргументы, результат выполнения и информацию 
-    об ошибках. Это позволяет обеспечить более глубокий контроль и анализ поведения программы.
+### Функциональность
 
-    #Функциональность
--  Логирует начало и конец выполнения функции.
--  Записывает результат выполнения функции или информацию об ошибке.
--  Поддерживает запись логов как в файл, так и в консоль.
--  Принимает необязательный аргумент filename, который определяет имя файла для записи логов. Если filename не задан, логи выводятся в консоль.
-   #Пример использования
-   '''from src.decorators import log
+- Логирует начало и конец выполнения функции.
+- Записывает результат выполнения функции или информацию об ошибке.
+- Поддерживает запись логов как в файл, так и в консоль.
+- Принимает необязательный аргумент `filename`, который определяет имя файла для записи логов. 
+  Если `filename` не задан, логи выводятся в консоль.
+
+### Пример использования
+
+```python
 
 @log(filename="mylog.txt")
 def my_function(x, y):
     return x + y
 
-my_function(1, 2)'''
+my_function(1, 2)
 
+
+## Тестирование
+
+- Для запуска тестов используйте `pytest`. Убедитесь, что у вас установлены все зависимости, и выполните команду:
+
+```bash
+pytest
+
+###  4: Проверка покрытия тестами
+
+ 1. **Установите необходимые зависимости**:
+   Убедитесь, что у вас установлены `pytest` и `pytest-cov` для проверки покрытия кода:
+
+   ```bash
+   pip install pytest pytest-cov
+
+
+```python
+
+  from src.data_readers import read_csv_transactions, read_excel_transactions
+
+  csv_transactions = read_csv_transactions("data/transactions.csv")
+  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
+## Модуль data_readers
+
+### Описание
+Модуль `data_readers` добавляет поддержку чтения финансовых транзакций из файлов CSV и Excel (XLSX), расширяя возможности проекта для работы с различными источниками данных.
+
+### Функции
+- **read_csv_transactions(path)**: Читает транзакции из CSV-файла.
+- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+
+  **Пример использования**:
+  ```python
+  from src.data_readers import read_csv_transactions, read_excel_transactions
+
+  csv_transactions = read_csv_transactions("data/transactions.csv")
+  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
