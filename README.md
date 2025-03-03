@@ -18,11 +18,13 @@
 ### Функции
 
 - **filter_by_currency(transactions, currency)**: Возвращает итератор транзакций по заданной валюте.
-- **read_csv_transactions(path)**: Читает транзакции из CSV-файла.
-- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
 
+-**read_csv_transactions(path)**: Читает транзакции из CSV-файла.
+-**read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+-**read_excel_transactions(path)**: Читает транзакции из Excel-файла.
 
   **Пример использования**:
+
   ```python
   usd_transactions = filter_by_currency(transactions, "USD")
   for _ in range(2):
@@ -46,6 +48,7 @@
 ### Пример использования
 
 ```python
+
 @log(filename="mylog.txt")
 def my_function(x, y):
     return x + y
@@ -66,10 +69,4 @@ pytest
    Убедитесь, что у вас установлены `pytest` и `pytest-cov` для проверки покрытия кода:
 
    ```bash
-   pip install pytest pytest-cov
-### Пример использования
-  ```python
-  from src.data_readers import read_csv_transactions, read_excel_transactions
-
-  csv_transactions = read_csv_transactions("data/transactions.csv")
-  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
+   pip install pytest pytes
