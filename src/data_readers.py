@@ -1,4 +1,5 @@
 """Модуль для чтения финансовых транзакций из CSV и Excel файлов."""
+
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -19,7 +20,8 @@ def read_csv_transactions(path: str) -> List[Dict[str, Any]]:
     """
     try:
         df = pd.read_csv(path)
-        return df.to_dict("records")
+        records = df.to_dict("records")
+        return [dict((str(k), v) for k, v in record.items()) for record in records]
     except FileNotFoundError:
         raise ValueError(f"Файл {path} не найден")
     except pd.errors.EmptyDataError:
@@ -40,7 +42,8 @@ def read_excel_transactions(path: str) -> List[Dict[str, Any]]:
     """
     try:
         df = pd.read_excel(path)
-        return df.to_dict("records")
+        records = df.to_dict("records")
+        return [dict((str(k), v) for k, v in record.items()) for record in records]
     except FileNotFoundError:
         raise ValueError(f"Файл {path} не найден")
     except pd.errors.EmptyDataError:

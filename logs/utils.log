@@ -1,0 +1,30 @@
+2024-11-12 18:01:23,677 - file_utils - INFO - Данные успешно сохранены в файл.
+2024-11-12 18:01:23,677 - file_utils - INFO - Начало тестов.
+2024-11-12 18:01:23,677 - file_utils - ERROR - Ошибка декодирования JSON в файле: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,677 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,677 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,677 - file_utils - WARNING - Файл не найден для удаления: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json
+2024-11-12 18:01:23,678 - file_utils - INFO - Данные успешно сохранены в файл.
+2024-11-12 18:01:23,678 - file_utils - INFO - Начало тестов.
+2024-11-12 18:01:23,679 - file_utils - ERROR - Ошибка декодирования JSON в файле: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json
+2024-11-12 18:01:23,679 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,679 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,679 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json
+2024-11-12 18:01:23,680 - file_utils - INFO - Данные успешно сохранены в файл.
+2024-11-12 18:01:23,680 - file_utils - INFO - Начало тестов.
+2024-11-12 18:01:23,680 - file_utils - INFO - Данные успешно загружены из файла: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,680 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,680 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,680 - file_utils - WARNING - Файл не найден для удаления: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json
+2024-11-12 18:01:23,681 - file_utils - INFO - Данные успешно сохранены в файл.
+2024-11-12 18:01:23,681 - file_utils - INFO - Начало тестов.
+2024-11-12 18:01:23,681 - file_utils - INFO - Данные успешно загружены из файла: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,681 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,681 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,681 - file_utils - WARNING - Файл не найден для удаления: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json
+2024-11-12 18:01:23,683 - file_utils - INFO - Данные успешно сохранены в файл.
+2024-11-12 18:01:23,683 - file_utils - INFO - Начало тестов.
+2024-11-12 18:01:23,683 - file_utils - ERROR - Файл не найден: /home/mdgagauz/PycharmProjects/bank_project/logs/non_existent.json
+2024-11-12 18:01:23,683 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json
+2024-11-12 18:01:23,683 - file_utils - INFO - Удален файл: /home/mdgagauz/PycharmProjects/bank_project/logs/empty.json
+2024-11-12 18:01:23,683 - file_utils - WARNING - Файл не найден для удаления: /home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json

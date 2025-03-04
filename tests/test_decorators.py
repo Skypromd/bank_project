@@ -1,62 +1,85 @@
-import logging
+# tests/test_decorators.py
+import os
 import sys
-from unittest.mock import patch
 
-import pytest
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+import logging
+import unittest
+from io import StringIO
 
 from src.decorators import log
 
-
-# Пример функции для тестирования
-@log()
-def sample_function(x, y):
-    return x + y
+print("Imported src.decorators from:", log.__module__, "at", log.__code__.co_filename)
 
 
-@log()
-def function_with_error(x, y):
-    return x / y  # Деление на ноль вызовет ошибку, если y == 0
+class TestDecorators(unittest.TestCase):
 
+    def setUp(self):
+        logging.getLogger().handlers = []
+        logging.getLogger().setLevel(logging.INFO)
 
-def test_sample_function_logs_success():
-    with patch("logging.info") as mock_logging:
-        result = sample_function(3, 5)
-        assert result == 8
-        mock_logging.assert_called_once_with("sample_function ok")
+    def tearDown(self):
+        log_file = "test_log.log"
+        if os.path.exists(log_file):
+            os.remove(log_file)
 
+    def test_log_without_filename_success(self):
+        """Тест успешного выполнения функции без файла логов."""
+        log_buffer = StringIO()
+        handler = logging.StreamHandler(log_buffer)
+        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+        logging.getLogger().addHandler(handler)
 
-def test_function_with_error_logs_error():
-    with patch("logging.error") as mock_logging:
-        with pytest.raises(ZeroDivisionError):
-            function_with_error(5, 0)
-        mock_logging.assert_called_once()
+        @log(filename=None)
+        def sample_func(x):
+            return x * 2
 
+        result = sample_func(5)
+        self.assertEqual(result, 10)
+        log_output = log_buffer.getvalue()
+        self.assertIn("sample_func ok", log_output)
+        logging.getLogger().removeHandler(handler)
+        log_buffer.close()
 
-def test_custom_log_filename():
-    with patch("logging.basicConfig") as mock_logging_config:
+    def test_log_with_filename_success(self):
+        """Тест успешного выполнения функции с файлом логов."""
+        log_file = "test_log.log"
+        handler = logging.FileHandler(log_file)
+        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+        logging.getLogger().addHandler(handler)
 
-        @log(filename="test.log")
-        def another_sample_function():
-            return "done"
+        @log(filename=log_file)
+        def sample_func(x):
+            return x * 2
 
-        another_sample_function()
-        mock_logging_config.assert_called_once_with(
-            filename="test.log", level=logging.INFO, format="%(asctime)s - %(message)s"
-        )
+        result = sample_func(5)
+        self.assertEqual(result, 10)
+        logging.getLogger().removeHandler(handler)
+        handler.close()
+        with open(log_file, "r") as f:
+            log_output = f.read()
+            self.assertIn("sample_func ok", log_output)
 
+    def test_log_with_error(self):
+        """Тест обработки исключения в декорированной функции."""
+        log_buffer = StringIO()
+        handler = logging.StreamHandler(log_buffer)
+        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
+        logging.getLogger().addHandler(handler)
 
-def test_log_no_filename():
-    with patch("logging.basicConfig") as mock_logging_config:
+        @log(filename=None)
+        def error_func():
+            raise ValueError("Test error")
 
-        @log()
-        def another_function():
-            return "done"
-
-        another_function()
-        mock_logging_config.assert_called_once_with(
-            stream=sys.stdout, level=logging.INFO, format="%(asctime)s - %(message)s"
-        )
+        with self.assertRaises(ValueError):
+            error_func()
+        log_output = log_buffer.getvalue()
+        self.assertIn("error_func error: ValueError", log_output)
+        self.assertIn("Inputs: (), {}", log_output)
+        logging.getLogger().removeHandler(handler)
+        log_buffer.close()
 
 
 if __name__ == "__main__":
-    pytest.main()
+    unittest.main(verbosity=2)
