@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import pandas as pd
 
 
+
 def read_csv_transactions(path: str) -> List[Dict[str, Any]]:
     """Читает финансовые транзакции из CSV-файла.
 
