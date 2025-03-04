@@ -1,77 +1,115 @@
+import os
+import sys
 import unittest
-from unittest.mock import patch, Mock
 
 import requests
-# Предполагаем, что это ваш модуль с функцией convert_currency
-from currency_converter import convert_currency  # Замените на правильный импорт
+from unittest.mock import patch
+
+from src.currency_converter import convert_currency, get_conversion_rate
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 class TestConvertCurrency(unittest.TestCase):
-
-    @patch("currency_converter.requests.get")  # Мокаем requests.get
-    def test_convert_currency_success(self, mock_get):
-        """Тесты успешной конвертации валют."""
-        # Настраиваем мок для API
-        mock_response = Mock()
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency(self, mock_get):
+        mock_response = mock_get.return_value
         mock_response.json.return_value = {"info": {"rate": 75.0}}
-        mock_response.raise_for_status.return_value = None
-        mock_get.return_value = mock_response
+        transaction_usd = {"operationAmount": {"amount": "100.0", "currency": {"code": "USD"}}}
+        self.assertEqual(convert_currency(transaction_usd), 7500.0)
 
-        # Тест 1: Конвертация USD в RUB
-        transaction_usd = {"operationAmount": {"amount": "100", "currency": {"code": "USD"}}}
-        result_usd = convert_currency(transaction_usd)
-        self.assertEqual(result_usd, 7500.0, "Ошибка конвертации USD в RUB")
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.return_value = {"info": {"rate": 80.0}}
+        self.assertEqual(get_conversion_rate("EUR", "RUB"), 80.0)
 
-        # Тест 2: Обработка RUB без конвертации
-        transaction_rub = {"operationAmount": {"amount": "31957.58", "currency": {"code": "RUB"}}}
-        result_rub = convert_currency(transaction_rub)
-        self.assertEqual(result_rub, 31957.58, "Ошибка обработки RUB")
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_missing_operation_amount(self, mock_get):
+        transaction_empty = {}
+        self.assertEqual(convert_currency(transaction_empty), 0.0)
+        mock_get.assert_not_called()
 
-    @patch("currency_converter.requests.get")
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_missing_fields(self, mock_get):
+        transaction_missing = {"operationAmount": {"amount": "", "currency": {"code": ""}}}
+        self.assertEqual(convert_currency(transaction_missing), 0.0)
+        mock_get.assert_not_called()
+
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate_request_exception(self, mock_get):
+        mock_get.side_effect = requests.RequestException("Network error")
+        result = get_conversion_rate("USD", "RUB")
+        print("RequestException triggered:", result)
+        self.assertEqual(result, 0.0)
+
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate_value_error_invalid_rate(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.return_value = {"info": {"rate": "invalid"}}
+        self.assertEqual(get_conversion_rate("USD", "RUB"), 0.0)
+
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate_value_error_json(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.side_effect = ValueError("Invalid JSON")
+        result = get_conversion_rate("USD", "RUB")
+        print("ValueError JSON triggered:", result)
+        self.assertEqual(result, 0.0)
+
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_negative_amount(self, mock_get):
+        transaction_negative = {"operationAmount": {"amount": "-100.0", "currency": {"code": "RUB"}}}
+        result = convert_currency(transaction_negative)
+        print("Negative amount triggered:", result)
+        self.assertEqual(result, 0.0)
+        self.assertTrue(float("-100.0") < 0)
+        mock_get.assert_not_called()
+
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_rub(self, mock_get):
+        transaction_rub = {"operationAmount": {"amount": "500.0", "currency": {"code": "RUB"}}}
+        self.assertEqual(convert_currency(transaction_rub), 500.0)
+        mock_get.assert_not_called()
+
+    @patch('src.currency_converter.requests.get')
     def test_convert_currency_unsupported_currency(self, mock_get):
-        """Тест обработки неподдерживаемой валюты."""
-        transaction_invalid = {"operationAmount": {"amount": "100.00", "currency": {"code": "JPY"}}}
-        result_invalid = convert_currency(transaction_invalid)
-        self.assertEqual(result_invalid, 0.0, "Неподдерживаемая валюта должна возвращать 0.0")
+        transaction_unsupported = {"operationAmount": {"amount": "100.0", "currency": {"code": "JPY"}}}
+        self.assertEqual(convert_currency(transaction_unsupported), 0.0)
+        mock_get.assert_not_called()
 
-    @patch("currency_converter.requests.get")
-    def test_convert_currency_api_error(self, mock_get):
-        """Тест обработки ошибок API."""
-        mock_get.side_effect = requests.RequestException("Ошибка API")
-        transaction_api_error = {"operationAmount": {"amount": "100.00", "currency": {"code": "USD"}}}
-        result_api_error = convert_currency(transaction_api_error)
-        self.assertEqual(result_api_error, 0.0, "Ошибка API должна возвращать 0.0")
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_invalid_rate(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.return_value = {"info": {"rate": 0.0}}
+        transaction_usd = {"operationAmount": {"amount": "100.0", "currency": {"code": "USD"}}}
+        self.assertEqual(convert_currency(transaction_usd), 0.0)
 
-    def test_convert_currency_missing_fields(self):
-        """Тесты для случаев с отсутствующими или некорректными полями."""
-        # Тест 1: Отсутствует operationAmount
-        transaction_missing_operation = {}
-        result_missing_operation = convert_currency(transaction_missing_operation)
-        self.assertEqual(result_missing_operation, 0.0, "Отсутствие operationAmount должно возвращать 0.0")
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate_with_rates(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.return_value = {"rates": {"RUB": 75.0}}
+        result = get_conversion_rate("USD", "RUB")
+        print("Rates format triggered:", result)
+        self.assertEqual(result, 75.0)
 
-        # Тест 2: Отсутствует amount
-        transaction_missing_amount = {"operationAmount": {"currency": {"code": "USD"}}}
-        result_missing_amount = convert_currency(transaction_missing_amount)
-        self.assertEqual(result_missing_amount, 0.0, "Отсутствие amount должно возвращать 0.0")
+    @patch('src.currency_converter.requests.get')
+    def test_get_conversion_rate_invalid_response(self, mock_get):
+        mock_response = mock_get.return_value
+        mock_response.json.return_value = {"invalid_key": {}}
+        result = get_conversion_rate("EUR", "USD")
+        print("Invalid response triggered:", result)
+        self.assertEqual(result, 0.0)
 
-        # Тест 3: Отрицательная сумма
-        transaction_negative_amount = {"operationAmount": {"amount": "-100.00", "currency": {"code": "USD"}}}
-        result_negative_amount = convert_currency(transaction_negative_amount)
-        self.assertEqual(result_negative_amount, 0.0, "Отрицательная сумма должна возвращать 0.0")
-
-        # Тест 4: Некорректный формат amount
-        transaction_invalid_amount = {"operationAmount": {"amount": "abc", "currency": {"code": "USD"}}}
-        result_invalid_amount = convert_currency(transaction_invalid_amount)
-        self.assertEqual(result_invalid_amount, 0.0, "Некорректный amount должен возвращать 0.0")
-
-    @patch("currency_converter.logging.info")
-    def test_logging(self, mock_logging):
-        """Тест логирования успешной конвертации."""
-        with patch("currency_converter.get_conversion_rate", return_value=80.0):
-            transaction = {"operationAmount": {"amount": "50", "currency": {"code": "USD"}}}
-            convert_currency(transaction)
-            mock_logging.assert_called_with("Конвертировано 50 USD в 4000.00 RUB")
+    @patch('src.currency_converter.requests.get')
+    def test_convert_currency_value_error(self, mock_get):
+        transaction_invalid = {"operationAmount": {"amount": "abc", "currency": {"code": "RUB"}}}
+        result = convert_currency(transaction_invalid)
+        print("ValueError in convert_currency triggered:", result)
+        self.assertEqual(result, 0.0)
+        mock_get.assert_not_called()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
+

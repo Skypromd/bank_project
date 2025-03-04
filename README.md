@@ -7,7 +7,7 @@
 ## Цели проекта
 - Обеспечить удобный интерфейс для работы с банковскими операциями.
 - Позволить пользователям фильтровать и сортировать операции.
---Поддерживать чтение транзакций из JSON, CSV и Excel файлов.
+- Поддерживать чтение транзакций из JSON, CSV и Excel файлов.
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -70,6 +70,21 @@ pytest
 
 ```python
 
+  from src.data_readers import read_csv_transactions, read_excel_transactions
+
+  csv_transactions = read_csv_transactions("data/transactions.csv")
+  excel_transactions = read_excel_transactions("data/transactions_excel.xlsx")
+## Модуль data_readers
+
+### Описание
+Модуль `data_readers` добавляет поддержку чтения финансовых транзакций из файлов CSV и Excel (XLSX), расширяя возможности проекта для работы с различными источниками данных.
+
+### Функции
+- **read_csv_transactions(path)**: Читает транзакции из CSV-файла.
+- **read_excel_transactions(path)**: Читает транзакции из Excel-файла.
+
+  **Пример использования**:
+  ```python
   from src.data_readers import read_csv_transactions, read_excel_transactions
 
   csv_transactions = read_csv_transactions("data/transactions.csv")
