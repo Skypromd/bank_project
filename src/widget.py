@@ -14,8 +14,10 @@ def get_date(date_str: str) -> str:
     if not date_str or not isinstance(date_str, str):
         return "N/A"
     from datetime import datetime
+
     date_obj = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
     return date_obj.strftime("%d.%m.%Y")
+
 
 def mask_account_card(input_string: str) -> str:
     """Маскирует номер карты или счёта.

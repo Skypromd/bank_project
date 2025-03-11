@@ -1,10 +1,15 @@
 # src/main.py (финальная версия)
 from typing import List, Dict, Optional
-from src.processing import search_transactions_by_description, filter_by_state, sort_by_date
+from src.processing import (
+    search_transactions_by_description,
+    filter_by_state,
+    sort_by_date,
+)
 from src.data_readers import read_csv_transactions, read_excel_transactions
 from src.file_utils import load_json_file
 from src.generators import filter_by_currency
 from src.widget import get_date, mask_account_card
+
 
 def main(transactions_input: Optional[List[Dict]] = None):
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
@@ -34,12 +39,16 @@ def main(transactions_input: Optional[List[Dict]] = None):
         return
 
     while True:
-        status = input("Введите статус для фильтрации (EXECUTED, CANCELED, PENDING): ").strip().upper()
+        status = (
+            input("Введите статус для фильтрации (EXECUTED, CANCELED, PENDING): ")
+            .strip()
+            .upper()
+        )
         if status in ["EXECUTED", "CANCELED", "PENDING"]:
             transactions = filter_by_state(transactions, status)
-            print(f"Операции отфильтрованы по статусу \"{status}\"")
+            print(f'Операции отфильтрованы по статусу "{status}"')
             break
-        print(f"Статус операции \"{status}\" недоступен")
+        print(f'Статус операции "{status}" недоступен')
 
     sort_choice = input("Отсортировать операции по дате? Да/Нет: ").strip().lower()
     if sort_choice == "да":
@@ -63,14 +72,23 @@ def main(transactions_input: Optional[List[Dict]] = None):
         print(f"Всего банковских операций в выборке: {len(transactions)}")
         for t in transactions:
             date = get_date(t.get("date", "N/A"))
-            amount = t.get("operationAmount", {}).get("amount", "N/A") if "operationAmount" in t else t.get("amount", "N/A")
-            currency = t.get("operationAmount", {}).get("currency", {}).get("code", "N/A") if "operationAmount" in t else t.get("currency", {}).get("code", "N/A")
+            amount = (
+                t.get("operationAmount", {}).get("amount", "N/A")
+                if "operationAmount" in t
+                else t.get("amount", "N/A")
+            )
+            currency = (
+                t.get("operationAmount", {}).get("currency", {}).get("code", "N/A")
+                if "operationAmount" in t
+                else t.get("currency", {}).get("code", "N/A")
+            )
             from_acc = mask_account_card(t.get("from", "N/A"))
             to_acc = mask_account_card(t.get("to", "N/A"))
             print(f"{date} {t.get('description', 'N/A')}")
             print(f"{from_acc} -> {to_acc}")
             print(f"Сумма: {amount} {currency}")
             print()
+
 
 if __name__ == "__main__":
     main()
