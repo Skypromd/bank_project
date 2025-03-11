@@ -1,27 +1,47 @@
-from datetime import datetime  # Третий
+# src/widget.py
+def get_date(date_str: str) -> str:
+    """Преобразует дату из формата ISO в формат ДД.ММ.ГГГГ.
 
+    Args:
+        date_str: Строка с датой в формате ISO.
 
-def mask_account_card(card_number: str) -> str:
-    """Маскирует номер банковской карты, оставляя видимыми первые 6 и последние 4 цифры."""
-    # Убираем все нецифровые символы
-    card_number_digits = "".join([char for char in card_number if char.isdigit()])
+    Returns:
+        Дата в формате ДД.ММ.ГГГГ или 'N/A' при некорректных данных.
 
-    # Проверка длины номера карты
-    if len(card_number_digits) != 16:
-        raise ValueError("Номер карты должен содержать 16 цифр.")
-
-    # Форматирование замаскированного номера карты
-    masked_number = f"{card_number_digits[:6]} {card_number_digits[6:8]}** **** {card_number_digits[-4:]}"
-    return masked_number
-
-
-def get_date(date_string: str) -> str:
+    Raises:
+        ValueError: Если формат даты некорректен.
     """
-    Преобразует строку даты в формате "2024-03-11T02:26:18.671407"
-    в формат "ДД.ММ.ГГГГ".
+    if not date_str or not isinstance(date_str, str):
+        return "N/A"
+    from datetime import datetime
+    date_obj = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+    return date_obj.strftime("%d.%m.%Y")
 
-    :param date_string: Дата в строковом формате.
-    :return: Дата в формате "ДД.ММ.ГГГГ".
+def mask_account_card(input_string: str) -> str:
+    """Маскирует номер карты или счёта.
+
+    Args:
+        input_string: Строка с номером карты или счёта (например, 'Maestro 1596837868705199').
+
+    Returns:
+        Замаскированный номер (например, 'Maestro 1596 83** **** 5199') или сообщение об ошибке.
     """
-    dt = datetime.fromisoformat(date_string)
-    return dt.strftime("%d.%m.%Y")
+    if not isinstance(input_string, str) or not input_string.strip():
+        return "Invalid input format"
+    parts = input_string.split()
+    if not parts:  # Проверка на пустой список
+        return "Invalid input format"
+    if len(parts) == 1:
+        if len(parts[0]) >= 16 and parts[0][-16:].isdigit():
+            name = parts[0][:-16]
+            number = parts[0][-16:]
+            return f"{name} {number[:4]} {number[4:6]}** **** {number[-4:]}"
+        return "Invalid input format"
+    number = parts[-1]
+    if not number.isdigit() or len(number) < 4:
+        return "Invalid input format"
+    if "Счет" in input_string:
+        return f"{' '.join(parts[:-1])} **{number[-4:]}"
+    if len(number) >= 16:
+        return f"{' '.join(parts[:-1])} {number[:4]} {number[4:6]}** **** {number[-4:]}"
+    return "Invalid input format"
