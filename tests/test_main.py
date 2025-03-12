@@ -47,9 +47,7 @@ class TestMain(unittest.TestCase):
         ]
         with patch("src.main.load_json_file", return_value=mock_data), patch(
             "builtins.input",
-            side_effect=generate_input(
-                "1", "EXECUTED", "нет", "нет", "да", "Открытие вклада"
-            ),
+            side_effect=generate_input("1", "EXECUTED", "нет", "нет", "да", "Открытие вклада"),
         ), patch("sys.stdout", new_callable=StringIO) as mock_stdout:
             src.main.main()
             output = mock_stdout.getvalue()
@@ -102,9 +100,7 @@ class TestMain(unittest.TestCase):
         ]
         with patch("src.main.read_excel_transactions", return_value=mock_data), patch(
             "builtins.input",
-            side_effect=generate_input(
-                "3", "PENDING", "да", "по убыванию", "да", "нет"
-            ),
+            side_effect=generate_input("3", "PENDING", "да", "по убыванию", "да", "нет"),
         ), patch("sys.stdout", new_callable=StringIO) as mock_stdout:
             src.main.main()
             output = mock_stdout.getvalue()
@@ -175,9 +171,7 @@ class TestMain(unittest.TestCase):
         ]
         with patch("src.main.load_json_file", return_value=mock_data), patch(
             "builtins.input",
-            side_effect=generate_input(
-                "1", "EXECUTED", "да", "по возрастанию", "нет", "нет"
-            ),
+            side_effect=generate_input("1", "EXECUTED", "да", "по возрастанию", "нет", "нет"),
         ), patch("sys.stdout", new_callable=StringIO) as mock_stdout:
             src.main.main()
             output = mock_stdout.getvalue()

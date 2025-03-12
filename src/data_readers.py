@@ -1,46 +1,45 @@
-"""Модуль для чтения финансовых транзакций из CSV и Excel файлов."""
-import pandas as pd
+# src/data_readers.py
 from typing import List, Dict, Any
+import pandas as pd
 
-
-
-def read_csv_transactions(path: str) -> List[Dict[str, Any]]:
-    """Читает финансовые транзакции из CSV-файла.
+def read_csv_transactions(file_path: str) -> List[Dict[str, Any]]:
+    """Читает транзакции из CSV-файла.
 
     Args:
-        path (str): Путь к CSV-файлу.
+        file_path: Путь к CSV-файлу.
 
     Returns:
-        List[Dict[str, Any]]: Список словарей с транзакциями.
+        Список словарей с данными транзакций.
 
     Raises:
-        ValueError: Если файл не найден или пуст.
+        ValueError: Если файл не найден.
     """
     try:
-        df = pd.read_csv(path)
-        return df.to_dict("records")
+        df = pd.read_csv(file_path)
+        transactions = [{str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")]
+        return transactions
     except FileNotFoundError:
-        raise ValueError(f"Файл {path} не найден")
+        raise ValueError(f"Файл {file_path} не найден")
     except pd.errors.EmptyDataError:
         return []
 
-
-def read_excel_transactions(path: str) -> List[Dict[str, Any]]:
-    """Читает финансовые транзакции из Excel-файла.
+def read_excel_transactions(file_path: str) -> List[Dict[str, Any]]:
+    """Читает транзакции из Excel-файла.
 
     Args:
-        path (str): Путь к Excel-файлу.
+        file_path: Путь к Excel-файлу.
 
     Returns:
-        List[Dict[str, Any]]: Список словарей с транзакциями.
+        Список словарей с данными транзакций.
 
     Raises:
-        ValueError: Если файл не найден или пуст.
+        ValueError: Если файл не найден.
     """
     try:
-        df = pd.read_excel(path)
-        return df.to_dict("records")
+        df = pd.read_excel(file_path)
+        transactions = [{str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")]
+        return transactions
     except FileNotFoundError:
-        raise ValueError(f"Файл {path} не найден")
+        raise ValueError(f"Файл {file_path} не найден")
     except pd.errors.EmptyDataError:
         return []
