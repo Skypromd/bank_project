@@ -8,7 +8,7 @@ from src.generators import (
     transaction_descriptions,
 )
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 class TestGenerators(unittest.TestCase):
@@ -41,11 +41,14 @@ class TestGenerators(unittest.TestCase):
         """Тест генератора номеров карт."""
         card_numbers = list(card_number_generator(1234567890123456, 1234567890123458))
         self.assertEqual(len(card_numbers), 3)
-        self.assertEqual(card_numbers, [
-            "1234 5678 9012 3456",
-            "1234 5678 9012 3457",
-            "1234 5678 9012 3458",
-        ])
+        self.assertEqual(
+            card_numbers,
+            [
+                "1234 5678 9012 3456",
+                "1234 5678 9012 3457",
+                "1234 5678 9012 3458",
+            ],
+        )
 
 
 if __name__ == "__main__":
