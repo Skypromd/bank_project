@@ -18,3 +18,4 @@ echo "test_output.txt" >> .gitignore
 echo "*.pyc" >> .gitignore
 echo "__pycache__/" >> .gitignore
 echo ".pytest_cache/" >> .gitignore
+.idea/

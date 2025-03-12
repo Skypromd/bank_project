@@ -1,7 +1,6 @@
 # src/processing.py
 from typing import List, Dict
 
-
 def filter_by_state(transactions: List[Dict], state: str) -> List[Dict]:
     """Фильтрует транзакции по заданному статусу.
 
@@ -13,7 +12,6 @@ def filter_by_state(transactions: List[Dict], state: str) -> List[Dict]:
         Отфильтрованный список транзакций.
     """
     return [t for t in transactions if t.get("state") == state]
-
 
 def sort_by_date(transactions: List[Dict], descending: bool = False) -> List[Dict]:
     """Сортирует транзакции по дате.
@@ -27,7 +25,6 @@ def sort_by_date(transactions: List[Dict], descending: bool = False) -> List[Dic
     """
     return sorted(transactions, key=lambda x: x.get("date", ""), reverse=descending)
 
-
 def search_transactions_by_description(transactions: List[Dict], search_str: str) -> List[Dict]:
     """Ищет транзакции по подстроке в описании.
 
@@ -40,7 +37,6 @@ def search_transactions_by_description(transactions: List[Dict], search_str: str
     """
     return [t for t in transactions if search_str.lower() in t.get("description", "").lower()]
 
-
 def filter_by_currency(transactions: List[Dict], currency: str) -> List[Dict]:
     """Фильтрует транзакции по заданной валюте.
 
@@ -51,9 +47,4 @@ def filter_by_currency(transactions: List[Dict], currency: str) -> List[Dict]:
     Returns:
         Отфильтрованный список транзакций.
     """
-    return [
-        t
-        for t in transactions
-        if t.get("operationAmount", {}).get("currency", {}).get("code", "") == currency
-        or t.get("currency", {}).get("code", "") == currency
-    ]
+    return [t for t in transactions if t.get("operationAmount", {}).get("currency", {}).get("code", "") == currency or t.get("currency", {}).get("code", "") == currency]
