@@ -1,11 +1,9 @@
-# src/main.py (с отладкой)
+# src/main.py (финальная версия)
 from typing import List, Dict, Optional
-from src.processing import search_transactions_by_description, filter_by_state, sort_by_date
+from src.processing import search_transactions_by_description, filter_by_state, sort_by_date, filter_by_currency, count_transactions_by_category
 from src.data_readers import read_csv_transactions, read_excel_transactions
 from src.file_utils import load_json_file
-from src.generators import filter_by_currency
 from src.widget import get_date, mask_account_card
-
 
 def main(transactions_input: Optional[List[Dict]] = None):
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
@@ -25,11 +23,19 @@ def main(transactions_input: Optional[List[Dict]] = None):
             print("Файл не найден. Пожалуйста, проверьте путь к файлу.")
             return
     elif choice == "2":
-        transactions = read_csv_transactions("data/transactions.csv")
-        print("Для обработки выбран CSV-файл.")
+        try:
+            transactions = read_csv_transactions("data/transactions.csv")
+            print("Для обработки выбран CSV-файл.")
+        except ValueError as e:
+            print(e)
+            return
     elif choice == "3":
-        transactions = read_excel_transactions("data/transactions_excel.xlsx")
-        print("Для обработки выбран XLSX-файл.")
+        try:
+            transactions = read_excel_transactions("data/transactions_excel.xlsx")
+            print("Для обработки выбран XLSX-файл.")
+        except ValueError as e:
+            print(e)
+            return
     else:
         print("Неверный выбор. Завершение программы.")
         return
@@ -38,15 +44,15 @@ def main(transactions_input: Optional[List[Dict]] = None):
         status = input("Введите статус для фильтрации (EXECUTED, CANCELED, PENDING): ").strip().upper()
         if status in ["EXECUTED", "CANCELED", "PENDING"]:
             transactions = filter_by_state(transactions, status)
-            print(f'Операции отфильтрованы по статусу "{status}"')
+            print(f"Операции отфильтрованы по статусу \"{status}\"")
             break
-        print(f'Статус операции "{status}" недоступен')
+        print(f"Статус операции \"{status}\" недоступен")
 
     sort_choice = input("Отсортировать операции по дате? Да/Нет: ").strip().lower()
     if sort_choice == "да":
         order = input("Отсортировать по возрастанию или по убыванию? ").strip().lower()
-        reverse = order == "по убыванию"
-        transactions = sort_by_date(transactions, reverse)
+        descending = order == "по убыванию"
+        transactions = sort_by_date(transactions, descending)
 
     rub_choice = input("Выводить только рублёвые транзакции? Да/Нет: ").strip().lower()
     if rub_choice == "да":
@@ -54,7 +60,7 @@ def main(transactions_input: Optional[List[Dict]] = None):
 
     search_choice = input("Отфильтровать по слову в описании? Да/Нет: ").strip().lower()
     if search_choice == "да":
-        search_str = input("Введите строку для поиска: ").strip()
+        search_str = input("Введите строку для поиска (поддерживаются регулярные выражения): ").strip()
         transactions = search_transactions_by_description(transactions, search_str)
 
     print("Распечатываю итоговый список транзакций...")
@@ -64,24 +70,24 @@ def main(transactions_input: Optional[List[Dict]] = None):
         print(f"Всего банковских операций в выборке: {len(transactions)}")
         for t in transactions:
             date = get_date(t.get("date", "N/A"))
-            amount = (
-                t.get("operationAmount", {}).get("amount", "N/A") if "operationAmount" in t else t.get("amount", "N/A")
-            )
-            currency = (
-                t.get("operationAmount", {}).get("currency", {}).get("code", "N/A")
-                if "operationAmount" in t
-                else t.get("currency", {}).get("code", "N/A")
-            )
-            print("DEBUG: Entering from_acc assignment")
+            amount = t.get("operationAmount", {}).get("amount", t.get("amount", "N/A"))
+            currency = t.get("operationAmount", {}).get("currency", "N/A")
+            if isinstance(currency, dict):
+                currency = currency.get("code", "N/A")
+            else:
+                currency = t.get("currency", "N/A")
+                if isinstance(currency, dict):
+                    currency = currency.get("code", "N/A")
             from_acc = mask_account_card(t.get("from", "N/A"))
-            debug_message = "DEBUG: from_acc set"
-            print(debug_message)
             to_acc = mask_account_card(t.get("to", "N/A"))
             print(f"{date} {t.get('description', 'N/A')}")
             print(f"{from_acc} -> {to_acc}")
             print(f"Сумма: {amount} {currency}")
             print()
-
+        print("Статистика по категориям:")
+        categories = count_transactions_by_category(transactions)
+        for category, count in categories.items():
+            print(f"{category}: {count}")
 
 if __name__ == "__main__":
     main()

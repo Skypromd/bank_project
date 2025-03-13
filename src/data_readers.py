@@ -15,7 +15,7 @@ def read_csv_transactions(file_path: str) -> List[Dict[str, Any]]:
         ValueError: Если файл не найден.
     """
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, delimiter=';')
         transactions = [{str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")]
         return transactions
     except FileNotFoundError:
