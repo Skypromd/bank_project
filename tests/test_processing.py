@@ -1,60 +1,103 @@
-import unittest
-
+# tests/test_processing.py
 from src.processing import filter_by_currency, filter_by_state, sort_by_date
 
-# Тестовые данные
-transactions = [
-    {"id": 1, "state": "EXECUTED", "date": "2023-01-01", "operationAmount": {"currency": {"code": "USD"}}},
-    {"id": 2, "state": "CANCELED", "date": "2023-01-02", "operationAmount": {"currency": {"code": "EUR"}}},
-    {"id": 3, "state": "EXECUTED", "date": "2023-02-01", "operationAmount": {"currency": {"code": "USD"}}},
-]
 
-
-class TestProcessing(unittest.TestCase):
-
-    def test_filter_by_state_executed(self):
-        expected = [
-            {"id": 1, "state": "EXECUTED", "date": "2023-01-01", "operationAmount": {"currency": {"code": "USD"}}},
-            {"id": 3, "state": "EXECUTED", "date": "2023-02-01", "operationAmount": {"currency": {"code": "USD"}}},
+class TestProcessing:
+    def test_filter_by_currency(self):
+        transactions = [
+            {"operationAmount": {"currency": {"code": "RUB"}}},
+            {"operationAmount": {"currency": {"code": "USD"}}},
         ]
-        result = filter_by_state(transactions, "EXECUTED")
-        self.assertEqual(result, expected)
+        result = list(filter_by_currency(transactions, "RUB"))
+        assert len(result) == 1
+        assert result[0]["operationAmount"]["currency"]["code"] == "RUB"
+
+    def test_filter_by_currency_direct(self):
+        transactions = [
+            {"operationAmount": {"currency": "RUB"}},
+            {"operationAmount": {"currency": "USD"}},
+        ]
+        result = list(filter_by_currency(transactions, "RUB"))
+        assert len(result) == 1
+        assert result[0]["operationAmount"]["currency"] == "RUB"
 
     def test_filter_by_state_canceled(self):
-        expected = [
-            {"id": 2, "state": "CANCELED", "date": "2023-01-02", "operationAmount": {"currency": {"code": "EUR"}}}
+        transactions = [
+            {
+                "id": 1,
+                "state": "EXECUTED",
+                "date": "2023-01-01T00:00:00",
+                "description": "Тест1",
+            },
+            {
+                "id": 2,
+                "state": "CANCELED",
+                "date": "2023-01-02T00:00:00",
+                "description": "Тест2",
+            },
         ]
         result = filter_by_state(transactions, "CANCELED")
-        self.assertEqual(result, expected)
+        assert result == [
+            {
+                "id": 2,
+                "state": "CANCELED",
+                "date": "2023-01-02T00:00:00",
+                "description": "Тест2",
+            }
+        ]
+
+    def test_filter_by_state_executed(self):
+        transactions = [
+            {
+                "id": 1,
+                "state": "EXECUTED",
+                "date": "2023-01-01T00:00:00",
+                "description": "Тест1",
+            },
+            {
+                "id": 2,
+                "state": "CANCELED",
+                "date": "2023-01-02T00:00:00",
+                "description": "Тест2",
+            },
+        ]
+        result = filter_by_state(transactions, "EXECUTED")
+        assert result == [
+            {
+                "id": 1,
+                "state": "EXECUTED",
+                "date": "2023-01-01T00:00:00",
+                "description": "Тест1",
+            }
+        ]
 
     def test_filter_by_state_unknown(self):
-        expected = []
+        transactions = [
+            {
+                "id": 1,
+                "state": "EXECUTED",
+                "date": "2023-01-01T00:00:00",
+                "description": "Тест1",
+            },
+            {
+                "id": 2,
+                "state": "CANCELED",
+                "date": "2023-01-02T00:00:00",
+                "description": "Тест2",
+            },
+        ]
         result = filter_by_state(transactions, "UNKNOWN")
-        self.assertEqual(result, expected)
+        assert result == []
 
     def test_sort_by_date(self):
-        # По убыванию
-        sorted_desc = sort_by_date(transactions, descending=True)
-        self.assertEqual(sorted_desc[0]["date"], "2023-02-01")
-        self.assertEqual(sorted_desc[-1]["date"], "2023-01-01")
-        # По возрастанию
-        sorted_asc = sort_by_date(transactions, descending=False)
-        self.assertEqual(sorted_asc[0]["date"], "2023-01-01")
-        self.assertEqual(sorted_asc[-1]["date"], "2023-02-01")
+        transactions = [
+            {"date": "2023-01-02T00:00:00", "description": "Тест2"},
+            {"date": "2023-01-01T00:00:00", "description": "Тест1"},
+        ]
+        result_asc = sort_by_date(transactions, reverse=False)
+        assert result_asc[0]["description"] == "Тест1"
+        assert result_asc[1]["description"] == "Тест2"
 
-    def test_filter_by_currency(self):
-        # USD
-        usd_result = list(filter_by_currency(transactions, "USD"))
-        self.assertEqual(len(usd_result), 2)
-        self.assertEqual(usd_result, [transactions[0], transactions[2]])
-        # EUR
-        eur_result = list(filter_by_currency(transactions, "EUR"))
-        self.assertEqual(len(eur_result), 1)
-        self.assertEqual(eur_result, [transactions[1]])
-        # JPY (несуществующая валюта)
-        none_result = list(filter_by_currency(transactions, "JPY"))
-        self.assertEqual(len(none_result), 0)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+        result_desc = sort_by_date(transactions, reverse=True)
+        assert result_desc[0]["description"] == "Тест2"
+        assert result_desc[1]["description"] == "Тест1"

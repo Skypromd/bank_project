@@ -1,8 +1,11 @@
 # tests/test_data_readers.py
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
 import pytest
+
 from src.data_readers import read_csv_transactions, read_excel_transactions
+
 
 class TestDataReaders:
     def test_read_csv_transactions_empty_file(self):
@@ -32,7 +35,16 @@ class TestDataReaders:
             mock_read_csv.return_value = sample_df
             result = read_csv_transactions("data/transactions.csv")
             assert result == sample_data
-            mock_read_csv.assert_called_once_with("data/transactions.csv", delimiter=';')
+            mock_read_csv.assert_called_once_with(
+                "data/transactions.csv", delimiter=";"
+            )
+
+    def test_read_csv_transactions_parser_error(self):
+        """Тест обработки ошибки парсинга CSV-файла."""
+        with patch("pandas.read_csv") as mock_read_csv:
+            mock_read_csv.side_effect = pd.errors.ParserError
+            result = read_csv_transactions("data/transactions.csv")
+            assert result == []
 
     def test_read_excel_transactions_empty_file(self):
         """Тест обработки пустого Excel-файла."""
@@ -62,3 +74,10 @@ class TestDataReaders:
             result = read_excel_transactions("data/transactions_excel.xlsx")
             assert result == sample_data
             mock_read_excel.assert_called_once_with("data/transactions_excel.xlsx")
+
+    def test_read_excel_transactions_value_error(self):
+        """Тест обработки ошибки значения в Excel-файле."""
+        with patch("pandas.read_excel") as mock_read_excel:
+            mock_read_excel.side_effect = ValueError
+            result = read_excel_transactions("data/transactions_excel.xlsx")
+            assert result == []

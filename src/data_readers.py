@@ -1,6 +1,8 @@
 # src/data_readers.py
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import pandas as pd
+
 
 def read_csv_transactions(file_path: str) -> List[Dict[str, Any]]:
     """Читает транзакции из CSV-файла.
@@ -15,13 +17,19 @@ def read_csv_transactions(file_path: str) -> List[Dict[str, Any]]:
         ValueError: Если файл не найден.
     """
     try:
-        df = pd.read_csv(file_path, delimiter=';')
-        transactions = [{str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")]
+        df = pd.read_csv(file_path, delimiter=";")
+        transactions = [
+            {str(k): v for k, v in record.items()}
+            for record in df.to_dict(orient="records")
+        ]
         return transactions
     except FileNotFoundError:
         raise ValueError(f"Файл {file_path} не найден")
     except pd.errors.EmptyDataError:
         return []
+    except pd.errors.ParserError:
+        return []
+
 
 def read_excel_transactions(file_path: str) -> List[Dict[str, Any]]:
     """Читает транзакции из Excel-файла.
@@ -37,9 +45,14 @@ def read_excel_transactions(file_path: str) -> List[Dict[str, Any]]:
     """
     try:
         df = pd.read_excel(file_path)
-        transactions = [{str(k): v for k, v in record.items()} for record in df.to_dict(orient="records")]
+        transactions = [
+            {str(k): v for k, v in record.items()}
+            for record in df.to_dict(orient="records")
+        ]
         return transactions
     except FileNotFoundError:
         raise ValueError(f"Файл {file_path} не найден")
     except pd.errors.EmptyDataError:
+        return []
+    except ValueError:
         return []

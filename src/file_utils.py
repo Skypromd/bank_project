@@ -6,7 +6,10 @@ log_file_path = "/home/mdgagauz/PycharmProjects/bank_project/logs/utils.log"
 
 # Настройка логирования
 logging.basicConfig(
-    filename=log_file_path, filemode="a", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+    filename=log_file_path,
+    filemode="a",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 

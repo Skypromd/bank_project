@@ -14,9 +14,18 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 class TestGenerators(unittest.TestCase):
     def setUp(self):
         self.transactions = [
-            {"operationAmount": {"currency": {"code": "USD"}}, "description": "Payment 1"},
-            {"operationAmount": {"currency": {"code": "EUR"}}, "description": "Payment 2"},
-            {"operationAmount": {"currency": {"code": "USD"}}, "description": "Payment 3"},
+            {
+                "operationAmount": {"currency": {"code": "USD"}},
+                "description": "Payment 1",
+            },
+            {
+                "operationAmount": {"currency": {"code": "EUR"}},
+                "description": "Payment 2",
+            },
+            {
+                "operationAmount": {"currency": {"code": "USD"}},
+                "description": "Payment 3",
+            },
         ]
 
     def test_filter_by_currency(self):

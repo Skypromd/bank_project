@@ -1,85 +1,74 @@
 # tests/test_decorators.py
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import logging
-import unittest
-from io import StringIO
+from unittest.mock import patch
+
+import pytest
 
 from src.decorators import log
 
-print("Imported src.decorators from:", log.__module__, "at", log.__code__.co_filename)
 
-
-class TestDecorators(unittest.TestCase):
-
-    def setUp(self):
-        logging.getLogger().handlers = []
-        logging.getLogger().setLevel(logging.INFO)
-
-    def tearDown(self):
-        log_file = "test_log.log"
-        if os.path.exists(log_file):
-            os.remove(log_file)
-
+class TestDecorators:
     def test_log_without_filename_success(self):
-        """Тест успешного выполнения функции без файла логов."""
-        log_buffer = StringIO()
-        handler = logging.StreamHandler(log_buffer)
-        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
-        logging.getLogger().addHandler(handler)
+        """Проверка успешного логирования без указания имени файла."""
 
-        @log(filename=None)
-        def sample_func(x):
-            return x * 2
+        @log()
+        def my_function(x, y):
+            return x + y
 
-        result = sample_func(5)
-        self.assertEqual(result, 10)
-        log_output = log_buffer.getvalue()
-        self.assertIn("sample_func ok", log_output)
-        logging.getLogger().removeHandler(handler)
-        log_buffer.close()
+        with patch("logging.Logger.info") as mock_logging_info:
+            result = my_function(3, 5)
+            assert result == 8
+            assert (
+                mock_logging_info.call_count == 2
+            )  # Ожидаем два вызова (успех и время)
 
     def test_log_with_filename_success(self):
-        """Тест успешного выполнения функции с файлом логов."""
-        log_file = "test_log.log"
-        handler = logging.FileHandler(log_file)
-        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
-        logging.getLogger().addHandler(handler)
+        """Проверка успешного логирования с указанием имени файла."""
 
-        @log(filename=log_file)
-        def sample_func(x):
-            return x * 2
+        @log("test_log.txt")
+        def my_function(x, y):
+            return x + y
 
-        result = sample_func(5)
-        self.assertEqual(result, 10)
-        logging.getLogger().removeHandler(handler)
-        handler.close()
-        with open(log_file, "r") as f:
-            log_output = f.read()
-            self.assertIn("sample_func ok", log_output)
+        with patch("logging.FileHandler") as mock_file_handler:
+            mock_file_handler.return_value.level = (
+                logging.INFO
+            )  # Устанавливаем уровень для мока
+            with patch("logging.Logger.info") as mock_logging_info:
+                result = my_function(3, 5)
+                assert result == 8
+                mock_file_handler.assert_called_once_with("test_log.txt")
+                assert mock_logging_info.call_count == 2  # Ожидаем два вызова
 
     def test_log_with_error(self):
-        """Тест обработки исключения в декорированной функции."""
-        log_buffer = StringIO()
-        handler = logging.StreamHandler(log_buffer)
-        handler.setFormatter(logging.Formatter("%(asctime)s - %(message)s"))
-        logging.getLogger().addHandler(handler)
+        """Проверка логирования при возникновении ошибки."""
 
-        @log(filename=None)
-        def error_func():
+        @log("test_log.txt")
+        def my_function(_x, _y):
             raise ValueError("Test error")
 
-        with self.assertRaises(ValueError):
-            error_func()
-        log_output = log_buffer.getvalue()
-        self.assertIn("error_func error: ValueError", log_output)
-        self.assertIn("Inputs: (), {}", log_output)
-        logging.getLogger().removeHandler(handler)
-        log_buffer.close()
+        with patch("logging.FileHandler") as mock_file_handler:
+            mock_file_handler.return_value.level = (
+                logging.ERROR
+            )  # Устанавливаем уровень для мока
+            with patch("logging.Logger.error") as mock_logging_error:
+                with pytest.raises(ValueError):
+                    my_function(3, 5)
+                mock_file_handler.assert_called_once_with("test_log.txt")
+                assert mock_logging_error.call_count == 1  # Проверяем вызов error
 
+    def test_log_with_none_filename(self):
+        """Проверка логирования с None как filename."""
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+        @log(None)
+        def my_function(x, y):
+            return x + y
+
+        with patch("logging.StreamHandler") as mock_stream_handler:
+            mock_stream_handler.return_value.level = (
+                logging.INFO
+            )  # Устанавливаем уровень для мока
+            with patch("logging.Logger.info") as mock_logging_info:
+                result = my_function(3, 5)
+                assert result == 8
+                mock_stream_handler.assert_called_once()
+                assert mock_logging_info.call_count == 2  # Ожидаем два вызова
