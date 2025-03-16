@@ -1,7 +1,21 @@
 __pycache__/
-.idea/
 *.pyc
 *.pyo
 *.pyd
-*.db
-*.egg-info/
+venv/
+*.log
+.coverage
+coverage_report/
+lib/
+python3
+=*
+.venv/
+.env
+.pytest_cache/
+echo ".coverage" >> .gitignore
+echo "coverage_report.tar.gz" >> .gitignore
+echo "test_output.txt" >> .gitignore
+echo "*.pyc" >> .gitignore
+echo "__pycache__/" >> .gitignore
+echo ".pytest_cache/" >> .gitignore
+.idea/

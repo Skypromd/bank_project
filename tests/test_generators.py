@@ -1,55 +1,64 @@
-from typing import Dict, List
+import os
+import sys
+import unittest
 
-import pytest
+from src.generators import (
+    card_number_generator,
+    filter_by_currency,
+    transaction_descriptions,
+)
 
-from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
-
-
-@pytest.fixture
-def transactions() -> List[Dict]:
-    return [
-        {
-            "id": 939719570,
-            "state": "EXECUTED",
-            "date": "2018-06-30T02:08:58.425572",
-            "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
-            "description": "Перевод организации",
-            "from": "Счет 75106830613657916952",
-            "to": "Счет 11776614605963066702",
-        },
-        {
-            "id": 142264268,
-            "state": "EXECUTED",
-            "date": "2019-04-04T23:20:05.206878",
-            "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
-            "description": "Перевод со счета на счет",
-            "from": "Счет 19708645243227258542",
-            "to": "Счет 75651667383060284188",
-        },
-        # Удаляем транзакцию с валютой RUB
-    ]
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
-def test_filter_by_currency(transactions: List[Dict]) -> None:
-    usd_transactions = list(filter_by_currency(transactions, "USD"))
-    assert len(usd_transactions) == 2
+class TestGenerators(unittest.TestCase):
+    def setUp(self):
+        self.transactions = [
+            {
+                "operationAmount": {"currency": {"code": "USD"}},
+                "description": "Payment 1",
+            },
+            {
+                "operationAmount": {"currency": {"code": "EUR"}},
+                "description": "Payment 2",
+            },
+            {
+                "operationAmount": {"currency": {"code": "USD"}},
+                "description": "Payment 3",
+            },
+        ]
 
-    rub_transactions = list(filter_by_currency(transactions, "RUB"))
-    assert len(rub_transactions) == 0  # Теперь тест должен проходить
+    def test_filter_by_currency(self):
+        """Тест фильтрации транзакций по валюте."""
+        usd_result = list(filter_by_currency(self.transactions, "USD"))
+        self.assertEqual(len(usd_result), 2)
+        self.assertEqual(usd_result, [self.transactions[0], self.transactions[2]])
+
+        eur_result = list(filter_by_currency(self.transactions, "EUR"))
+        self.assertEqual(len(eur_result), 1)
+        self.assertEqual(eur_result, [self.transactions[1]])
+
+        none_result = list(filter_by_currency(self.transactions, "JPY"))
+        self.assertEqual(len(none_result), 0)
+
+    def test_transaction_descriptions(self):
+        """Тест генератора описаний транзакций."""
+        desc_result = list(transaction_descriptions(self.transactions))
+        self.assertEqual(desc_result, ["Payment 1", "Payment 2", "Payment 3"])
+
+    def test_card_number_generator(self):
+        """Тест генератора номеров карт."""
+        card_numbers = list(card_number_generator(1234567890123456, 1234567890123458))
+        self.assertEqual(len(card_numbers), 3)
+        self.assertEqual(
+            card_numbers,
+            [
+                "1234 5678 9012 3456",
+                "1234 5678 9012 3457",
+                "1234 5678 9012 3458",
+            ],
+        )
 
 
-def test_transaction_descriptions(transactions: List[Dict]) -> None:
-    descriptions = list(transaction_descriptions(transactions))
-    assert descriptions == ["Перевод организации", "Перевод со счета на счет"]
-
-
-def test_card_number_generator() -> None:
-    generator = card_number_generator(1, 5)
-    numbers = list(generator)
-    assert numbers == [
-        "0000 0000 0000 0001",
-        "0000 0000 0000 0002",
-        "0000 0000 0000 0003",
-        "0000 0000 0000 0004",
-        "0000 0000 0000 0005",
-    ]
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

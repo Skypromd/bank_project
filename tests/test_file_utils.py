@@ -1,7 +1,23 @@
-import unittest
 import json
+import logging
 import os
-from src.file_utils import load_json_file  # Исправлено импортирование
+import unittest
+from unittest.mock import patch
+
+from src.file_utils import load_json_file, safe_json_dump
+
+# Настройка логирования для тестов (в память, а не в файл)
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger()
+logger.handlers = []  # Очистка обработчиков
+memory_handler = logging.StreamHandler()
+memory_handler.setLevel(logging.DEBUG)
+memory_handler.setFormatter(
+    logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+)
+logger.addHandler(memory_handler)
 
 
 class TestUtils(unittest.TestCase):
@@ -9,50 +25,93 @@ class TestUtils(unittest.TestCase):
     def setUp(self):
         """Создание тестовых данных перед каждым тестом."""
         self.valid_data = [{"id": 1, "amount": 100.0}, {"id": 2, "amount": 200.0}]
-        os.makedirs("data", exist_ok=True)  # Создание директории, если она не существует
+        self.test_file = (
+            "/home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json"
+        )
+        self.empty_file = "/home/mdgagauz/PycharmProjects/bank_project/logs/empty.json"
+        self.invalid_file = (
+            "/home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json"
+        )
 
-        # Создание файла с корректным JSON
-        with open("data/operations.json", "w", encoding="utf-8") as f:
-            json.dump(self.valid_data, f, ensure_ascii=False, indent=4)
+        # Создание тестового файла с данными
+        with open(self.test_file, "w", encoding="utf-8") as f:
+            safe_json_dump(self.valid_data, f)
 
         # Создание пустого файла
-        with open("data/empty.json", "w") as f:
+        with open(self.empty_file, "w", encoding="utf-8") as f:
             f.write("")
+
+        # Создание файла с некорректным JSON
+        with open(self.invalid_file, "w", encoding="utf-8") as f:
+            f.write("invalid json")
+
+        logger.info("Начало тестов.")
 
     def tearDown(self):
         """Удаление тестовых данных после каждого теста."""
-        # Удаление файлов, если они существуют
-        for filename in ["operations.json", "empty.json", "invalid.json"]:
+        for file in [self.test_file, self.empty_file, self.invalid_file]:
             try:
-                os.remove(f"data/{filename}")
+                os.remove(file)
+                logger.info("Удален файл: %s", file)
             except FileNotFoundError:
-                continue  # Игнорируем, если файл уже был удален
+                logger.warning("Файл не найден для удаления: %s", file)
 
-    def test_load_json_file(self):
+    def test_safe_json_dump_success(self):
+        """Тест успешного сохранения JSON."""
+        with open(self.test_file, "w", encoding="utf-8") as f:
+            safe_json_dump(self.valid_data, f)
+        with open(self.test_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertEqual(data, self.valid_data)
+
+    def test_safe_json_dump_error(self):
+        """Тест ошибки при сохранении JSON."""
+        with patch("json.dump", side_effect=Exception("Test error")):
+            with open(self.test_file, "w", encoding="utf-8") as f:
+                safe_json_dump(self.valid_data, f)
+            # Проверяем, что файл остался пустым
+            with open(self.test_file, "r", encoding="utf-8") as f:
+                self.assertEqual(f.read(), "")
+
+    def test_load_json_file_success(self):
         """Тест чтения корректного JSON файла."""
-        result = load_json_file("data/operations.json")
+        result = load_json_file(self.test_file)
         self.assertIsInstance(result, list)
         self.assertEqual(result, self.valid_data)
 
     def test_empty_file(self):
         """Тест чтения пустого JSON файла."""
-        result = load_json_file("data/empty.json")
+        result = load_json_file(self.empty_file)
         self.assertEqual(result, [])
 
     def test_non_existent_file(self):
         """Тест чтения несуществующего файла."""
-        result = load_json_file("data/non_existent.json")
+        result = load_json_file(
+            "/home/mdgagauz/PycharmProjects/bank_project/logs/non_existent.json"
+        )
         self.assertEqual(result, [])
 
     def test_invalid_json(self):
         """Тест чтения файла с некорректным JSON."""
-        # Создание файла с некорректным JSON
-        with open("data/invalid.json", "w", encoding="utf-8") as f:
-            f.write("invalid json")
-
-        result = load_json_file("data/invalid.json")
+        result = load_json_file(self.invalid_file)
         self.assertEqual(result, [])
+
+    def test_load_json_file_general_exception(self):
+        """Тест общего исключения при загрузке JSON."""
+        with patch("builtins.open", side_effect=Exception("General error")):
+            result = load_json_file(self.test_file)
+            self.assertEqual(result, [])
+
+    def test_logging(self):
+        """Тестирование логирования."""
+        with self.assertLogs("root", level="INFO") as cm:
+            load_json_file(self.test_file)
+            self.assertIn("Данные успешно загружены из файла", cm.output[0])
+        with self.assertLogs("root", level="ERROR") as cm:
+            load_json_file("/nonexistent.json")
+            self.assertIn("Файл не найден", cm.output[0])
 
 
 if __name__ == "__main__":
-    unittest.main()
+    logger.info("Запуск программы.")
+    unittest.main(verbosity=2)
