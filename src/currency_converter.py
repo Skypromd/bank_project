@@ -6,6 +6,7 @@ import requests
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def get_conversion_rate(from_currency: str, to_currency: str) -> float:
     url = "https://api.exchangerate-api.com/v4/latest/" + from_currency
     params: dict[str, str] = {"base": from_currency, "symbols": to_currency}
@@ -25,6 +26,7 @@ def get_conversion_rate(from_currency: str, to_currency: str) -> float:
         return 0.0  # Без logger.error
     except ValueError:
         return 0.0  # Без logger.error
+
 
 def convert_currency(transaction_data: Dict[str, Any]) -> float:
     operation_amount = transaction_data.get("operationAmount")

@@ -1,34 +1,65 @@
-from typing import Dict, Iterator, List
+# src/processing.py
+from datetime import datetime
+from typing import Any, Dict, List
 
 
-def filter_by_state(transactions: List[Dict], state: str = "EXECUTED") -> List[Dict]:
-    """Фильтрует список словарей по значению ключа 'state'.
-
-    Args:
-        transactions (List[Dict]): Список словарей с данными о банковских операциях.
-        state (str, optional): Значение для фильтрации по ключу 'state'. По умолчанию 'EXECUTED'.
-
-    Returns:
-        List[Dict]: Новый список словарей, соответствующих условию фильтрации.
+def filter_by_state(
+    transactions: List[Dict[str, Any]], state: str
+) -> List[Dict[str, Any]]:
     """
-    return [transaction for transaction in transactions if transaction.get("state") == state]
+    Фильтрует транзакции по статусу.
 
-
-def sort_by_date(transactions: List[Dict], descending: bool = True) -> List[Dict]:
-    """Сортирует список словарей по дате.
-
-    Args:
-        transactions (List[Dict]): Список словарей с данными о банковских операциях.
-        descending (bool, optional): Указывает порядок сортировки. По умолчанию True (по убыванию).
-
-    Returns:
-        List[Dict]: Новый список словарей, отсортированных по дате.
+    :param transactions: Список транзакций.
+    :param state: Статус для фильтрации (EXECUTED, CANCELED, PENDING).
+    :return: Список отфильтрованных транзакций.
     """
-    return sorted(transactions, key=lambda x: x["date"], reverse=descending)
+    return [t for t in transactions if t.get("state") == state]
 
 
-def filter_by_currency(transactions: List[Dict], currency: str) -> Iterator[Dict]:
-    """Возвращает итератор транзакций по заданной валюте."""
-    for transaction in transactions:
-        if transaction["operationAmount"]["currency"]["code"] == currency:
-            yield transaction
+def filter_by_currency(
+    transactions: List[Dict[str, Any]], currency: str
+) -> List[Dict[str, Any]]:
+    """
+    Фильтрует транзакции по валюте.
+
+    :param transactions: Список транзакций.
+    :param currency: Код валюты для фильтрации (например, "RUB").
+    :return: Список отфильтрованных транзакций.
+    """
+    return [
+        t
+        for t in transactions
+        if (
+            (
+                isinstance(t.get("operationAmount", {}).get("currency", {}), dict)
+                and t.get("operationAmount", {}).get("currency", {}).get("code", "")
+                == currency
+            )
+            or t.get("currency", "") == currency
+            or (
+                isinstance(t.get("operationAmount", {}).get("currency", ""), str)
+                and t.get("operationAmount", {}).get("currency", "") == currency
+            )
+        )
+    ]
+
+
+def sort_by_date(
+    transactions: List[Dict[str, Any]], reverse: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Сортирует транзакции по дате.
+
+    :param transactions: Список транзакций.
+    :param reverse: Если True, сортировка по убыванию, иначе по возрастанию.
+    :return: Отсортированный список транзакций.
+    """
+
+    def parse_date(t: Dict[str, Any]) -> datetime:
+        date_str = t.get("date", "1970-01-01T00:00:00")
+        try:
+            return datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        except ValueError:
+            return datetime(1970, 1, 1)
+
+    return sorted(transactions, key=parse_date, reverse=reverse)

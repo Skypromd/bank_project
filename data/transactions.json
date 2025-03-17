@@ -1,0 +1,5 @@
+[
+    {"date": "2023-01-01T00:00:00", "description": "Пополнение счета", "state": "EXECUTED", "operationAmount": {"amount": "10000", "currency": {"code": "RUB"}}, "from": "Счет 1234567890", "to": "Счет 0987654321"},
+    {"date": "2023-01-02T12:30:00", "description": "Перевод организации", "state": "EXECUTED", "operationAmount": {"amount": "5000", "currency": {"code": "USD"}}, "from": "Visa 1234567890123456", "to": "Счет 0987654321"},
+    {"date": "2023-01-03T09:15:00", "description": "Снятие наличных", "state": "CANCELED", "operationAmount": {"amount": "2000", "currency": {"code": "EUR"}}, "from": "Maestro 1234567890123456", "to": "Счет 0987654321"}
+]

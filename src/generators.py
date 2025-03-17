@@ -17,6 +17,6 @@ def transaction_descriptions(transactions: List[Dict]) -> Iterator[str]:
 def card_number_generator(start: int, stop: int) -> Iterator[str]:
     """Генератор для генерации номеров карт в заданном диапазоне."""
     for number in range(start, stop + 1):
-        yield f"{number:016d}"[:4] + " " + f"{number:016d}"[4:8] + " " + f"{number:016d}"[
-            8:12
-        ] + " " + f"{number:016d}"[12:16]
+        yield f"{number:016d}"[:4] + " " + f"{number:016d}"[
+            4:8
+        ] + " " + f"{number:016d}"[8:12] + " " + f"{number:016d}"[12:16]

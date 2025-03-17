@@ -5,7 +5,6 @@ __pycache__/
 venv/
 *.log
 .coverage
-htmlcov/
 coverage_report/
 lib/
 python3
@@ -13,3 +12,10 @@ python3
 .venv/
 .env
 .pytest_cache/
+echo ".coverage" >> .gitignore
+echo "coverage_report.tar.gz" >> .gitignore
+echo "test_output.txt" >> .gitignore
+echo "*.pyc" >> .gitignore
+echo "__pycache__/" >> .gitignore
+echo ".pytest_cache/" >> .gitignore
+.idea/
