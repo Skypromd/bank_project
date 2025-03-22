@@ -1,8 +1,13 @@
 import json
 import logging
 
+from src.config import LOGS_DIR
+
+# Создаём директорию logs, если её нет
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 # Путь к лог-файлу
-log_file_path = "/home/mdgagauz/PycharmProjects/bank_project/logs/utils.log"
+log_file_path = LOGS_DIR / "utils.log"
 
 # Настройка логирования
 logging.basicConfig(
@@ -14,7 +19,7 @@ logging.basicConfig(
 
 
 def safe_json_dump(data, file):
-    """Сохраняет данные в формате JSON в файл с логирование."""
+    """Сохраняет данные в формате JSON в файл с логированием."""
     try:
         json.dump(data, file, ensure_ascii=False, indent=4)
         logging.info("Данные успешно сохранены в файл.")
@@ -23,7 +28,7 @@ def safe_json_dump(data, file):
 
 
 def load_json_file(file_path):
-    """Загружает данные из JSON файла с легированием."""
+    """Загружает данные из JSON файла с логированием."""
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             data = json.load(file)

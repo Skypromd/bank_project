@@ -4,6 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
+from src.config import LOGS_DIR
 from src.file_utils import load_json_file, safe_json_dump
 
 # Настройка логирования для тестов (в память, а не в файл)
@@ -21,17 +22,12 @@ logger.addHandler(memory_handler)
 
 
 class TestUtils(unittest.TestCase):
-
     def setUp(self):
         """Создание тестовых данных перед каждым тестом."""
         self.valid_data = [{"id": 1, "amount": 100.0}, {"id": 2, "amount": 200.0}]
-        self.test_file = (
-            "/home/mdgagauz/PycharmProjects/bank_project/logs/test_data.json"
-        )
-        self.empty_file = "/home/mdgagauz/PycharmProjects/bank_project/logs/empty.json"
-        self.invalid_file = (
-            "/home/mdgagauz/PycharmProjects/bank_project/logs/invalid.json"
-        )
+        self.test_file = LOGS_DIR / "test_data.json"
+        self.empty_file = LOGS_DIR / "empty.json"
+        self.invalid_file = LOGS_DIR / "invalid.json"
 
         # Создание тестового файла с данными
         with open(self.test_file, "w", encoding="utf-8") as f:
@@ -86,9 +82,8 @@ class TestUtils(unittest.TestCase):
 
     def test_non_existent_file(self):
         """Тест чтения несуществующего файла."""
-        result = load_json_file(
-            "/home/mdgagauz/PycharmProjects/bank_project/logs/non_existent.json"
-        )
+        not_existing_file_path = LOGS_DIR / "non_existent.json"
+        result = load_json_file(not_existing_file_path)
         self.assertEqual(result, [])
 
     def test_invalid_json(self):
@@ -108,7 +103,7 @@ class TestUtils(unittest.TestCase):
             load_json_file(self.test_file)
             self.assertIn("Данные успешно загружены из файла", cm.output[0])
         with self.assertLogs("root", level="ERROR") as cm:
-            load_json_file("/nonexistent.json")
+            load_json_file(LOGS_DIR / "nonexistent.json")
             self.assertIn("Файл не найден", cm.output[0])
 
 
